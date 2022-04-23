@@ -1,3 +1,5 @@
+import org.apache.xml.utils.res.StringArrayWrapper;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,8 +17,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         int followers = 0;
         int averageViewers = 0;
-        String scanDate = " ";
-        int activeSubs = 0; // Can be null
+        String scanDate = "Data";
         int twitchRank = 0;
         String following = "Create array based on number following";
 
@@ -24,20 +25,21 @@ public class Main {
 
         System.out.println("Username: ");
         String username = sc.next();
-        getData(username);
-        System.out.println(twitchRank + ". " + username + " " + scanDate);
-        System.out.println("Average viewers: " + averageViewers);
-        System.out.println("Followers: " + followers);
-        System.out.println("Active subs: " + activeSubs);
+        String[] usernameData = getData(username);
+        System.out.println(usernameData[1] + ". " + username + " " + scanDate);
+        System.out.println("Average viewers: " + usernameData[3]);
+        System.out.println("Followers: " + usernameData[8]);
         System.out.println("Following save to file. Want see in console? Y/n (CAN BE LARGE)");
         sc.next();
 
     }
 
-    public static void getData (String user) throws IOException {
+    public static String[] getData (String user) throws IOException {
         BufferedReader reader;
         String line;
-        StringBuffer responseContent = new StringBuffer();
+        String responseContent = null;
+        String[] responseArray;
+
 
         URL url = new URL("https://twitchtracker.com/api/channels/summary/" + user);
         connection = (HttpURLConnection) url.openConnection();
@@ -51,19 +53,23 @@ public class Main {
         if (status > 299) {
             reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
             while((line = reader.readLine()) != null){
-                responseContent.append(line);
+                responseContent = line;
             }
             reader.close();
         } else {
             reader = new BufferedReader((new InputStreamReader(connection.getInputStream())));
             while ((line = reader.readLine()) != null){
-                responseContent.append(line);
+                responseContent = line;
             }
             reader.close();
         }
-        System.out.println(responseContent.toString());
+        responseContent = responseContent.replaceAll("\\D+",",");
+        responseArray = responseContent.split(",");
+//        System.out.println(responseContent);
 
         connection.disconnect();
+
+        return responseArray;
     }
 
 
