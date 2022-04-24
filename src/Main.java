@@ -1,11 +1,9 @@
-import org.apache.xml.utils.res.StringArrayWrapper;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Scanner;
 
 
@@ -19,7 +17,7 @@ public class Main {
         int averageViewers = 0;
         String scanDate = "Data";
         int twitchRank = 0;
-        String following = "Create array based on number following";
+
 
         Scanner sc = new Scanner(System.in);
 
@@ -31,6 +29,20 @@ public class Main {
         System.out.println("Followers: " + usernameData[8]);
         System.out.println("Following save to file. Want see in console? Y/n (CAN BE LARGE)");
         sc.next();
+        String[] following = getFollowing(username);
+        try {
+            for (int i = 11; i <= following.length; i++) {
+                boolean contains = following[i].contains("display_name");
+
+                if (contains == true) {
+                    following[i] = following[i].replace("display_name", "");
+                    following[i] = following[i].replaceAll("[\",:]*", "");
+                    System.out.println(following[i]);
+                }
+            }
+        } catch (ArrayIndexOutOfBoundsException e){
+            return;
+        }
 
     }
 
@@ -70,6 +82,44 @@ public class Main {
         connection.disconnect();
 
         return responseArray;
+    }
+
+    public static String[] getFollowing (String user) throws IOException {
+        BufferedReader reader;
+        String line;
+        String responseContent = null;
+        String[] followingArray;
+
+
+        URL url = new URL("https://api.twitchdatabase.com/following/" + user);
+        connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod("GET");
+        connection.setConnectTimeout(5000);
+        connection.setReadTimeout(5000);
+
+        int status = connection.getResponseCode();
+
+        if (status > 299) {
+            reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+            while((line = reader.readLine()) != null){
+                responseContent = line;
+            }
+            reader.close();
+        } else {
+            reader = new BufferedReader((new InputStreamReader(connection.getInputStream())));
+            while ((line = reader.readLine()) != null){
+                responseContent = line;
+            }
+            reader.close();
+        }
+//        responseContent = responseContent.replaceAll("\\D+",",");
+        followingArray = responseContent.split(",");
+//        System.out.println(followingArray);
+
+        connection.disconnect();
+
+        return followingArray;
     }
 
 
