@@ -1,9 +1,6 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Scanner;
 
 
@@ -13,10 +10,10 @@ public class Main {
     private static HttpURLConnection connection;
 
     public static void main(String[] args) throws IOException {
-        int followers = 0;
-        int averageViewers = 0;
+
+
         String scanDate = "Data";
-        int twitchRank = 0;
+
 
 
         Scanner sc = new Scanner(System.in);
@@ -34,15 +31,17 @@ public class Main {
             for (int i = 11; i <= following.length; i++) {
                 boolean contains = following[i].contains("display_name");
 
-                if (contains == true) {
+                if (contains) {
                     following[i] = following[i].replace("display_name", "");
                     following[i] = following[i].replaceAll("[\",:]*", "");
                     System.out.println(following[i]);
                 }
             }
         } catch (ArrayIndexOutOfBoundsException e){
-            return;
+            System.out.println("Error");
         }
+
+
 
     }
 
@@ -64,20 +63,18 @@ public class Main {
 
         if (status > 299) {
             reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-            while((line = reader.readLine()) != null){
-                responseContent = line;
-            }
-            reader.close();
         } else {
             reader = new BufferedReader((new InputStreamReader(connection.getInputStream())));
-            while ((line = reader.readLine()) != null){
-                responseContent = line;
-            }
-            reader.close();
         }
-        responseContent = responseContent.replaceAll("\\D+",",");
+        while((line = reader.readLine()) != null){
+            responseContent = line;
+        }
+        reader.close();
+
+        assert responseContent != null;
+        responseContent = responseContent.replaceAll("\\D+", ",");
+
         responseArray = responseContent.split(",");
-//        System.out.println(responseContent);
 
         connection.disconnect();
 
@@ -102,20 +99,15 @@ public class Main {
 
         if (status > 299) {
             reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-            while((line = reader.readLine()) != null){
-                responseContent = line;
-            }
-            reader.close();
         } else {
             reader = new BufferedReader((new InputStreamReader(connection.getInputStream())));
-            while ((line = reader.readLine()) != null){
-                responseContent = line;
-            }
-            reader.close();
         }
-//        responseContent = responseContent.replaceAll("\\D+",",");
+        while((line = reader.readLine()) != null){
+            responseContent = line;
+        }
+        reader.close();
+        assert responseContent != null;
         followingArray = responseContent.split(",");
-//        System.out.println(followingArray);
 
         connection.disconnect();
 
